@@ -2,664 +2,729 @@
 <html lang="en">
 
 <head>
-    <meta charset="utf-8" />
-    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-    <title>Ludo Fun</title>
-    <link href="data:image/x-icon;base64," rel="icon" type="image/x-icon" />
-    <link href="https://fonts.googleapis.com" rel="preconnect" />
-    <link crossorigin="" href="https://fonts.gstatic.com/" rel="preconnect" />
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&amp;display=swap"
-        rel="stylesheet" />
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
-    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <script id="tailwind-config">
-        tailwind.config = {
-            darkMode: "class",
-            theme: {
-                extend: {
-                    colors: {
-                        "primary": "#f9f506",
-                        "background-light": "#f8f8f5",
-                        "background-dark": "#23220f",
-                    },
-                    fontFamily: {
-                        "display": ["Plus Jakarta Sans", "sans-serif"]
-                    },
-                    borderRadius: {
-                        "DEFAULT": "0.5rem",
-                        "lg": "1rem",
-                        "xl": "1.5rem",
-                        "full": "9999px"
-                    },
-                },
-            },
+  <meta charset="utf-8" />
+  <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+  <title>Ludo Trivia</title>
+  <link href="bg-colors.jpg" rel="icon" type="image/jpg" />
+  <link href="https://fonts.googleapis.com" rel="preconnect" />
+  <link crossorigin="" href="https://fonts.gstatic.com/" rel="preconnect" />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&amp;display=swap"
+    rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            primary: "#f9f506",
+            "background-light": "#f8f8f5",
+            "background-dark": "#23220f",
+          },
+          fontFamily: {
+            display: ["Plus Jakarta Sans", "sans-serif"],
+          },
+          borderRadius: {
+            DEFAULT: "0.5rem",
+            lg: "1rem",
+            xl: "1.5rem",
+            full: "9999px",
+          },
+        },
+      },
+    };
+  </script>
+  <style type="text/tailwindcss">
+    .ludo-board {
+        display: grid;
+        grid-template-columns: 6fr 3fr 6fr;
+        grid-template-rows: 6fr 3fr 6fr;
+        width: clamp(300px, 90vw, 600px);
+        aspect-ratio: 1 / 1;
+        border: 4px solid #1a1a1a;
+      }
+      .ludo-path {
+        display: grid;
+        grid-template-columns: repeat(6, 1fr);
+        grid-template-rows: repeat(3, 1fr);
+      }
+      .ludo-path-vertical {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        grid-template-rows: repeat(6, 1fr);
+      }
+      .pawn {
+        width: 70%;
+        height: 70%;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: bold;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3),
+          inset 0 2px 4px rgba(255, 255, 255, 0.3);
+        border: 3px solid white;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+      }
+      .pawn::before {
+        content: "";
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: linear-gradient(
+          45deg,
+          transparent,
+          rgba(255, 255, 255, 0.1),
+          transparent
+        );
+        transform: rotate(45deg);
+        transition: all 0.6s ease;
+        opacity: 0;
+      }
+      .card:hover .pawn {
+        transform: scale(1.1) rotate(5deg);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4),
+          inset 0 2px 4px rgba(255, 255, 255, 0.4),
+          0 0 20px rgba(255, 255, 255, 0.3);
+      }
+      .card:hover .pawn::before {
+        opacity: 1;
+        animation: shimmer 1.5s ease-in-out infinite;
+      }
+      @keyframes shimmer {
+        0% {
+          transform: rotate(45deg) translateX(-100%);
         }
-    </script>
-    <style type="text/tailwindcss">
-        .ludo-board {
-            display: grid;
-            grid-template-columns: 6fr 3fr 6fr;
-            grid-template-rows: 6fr 3fr 6fr;
-            width: clamp(300px, 90vw, 600px);
-            aspect-ratio: 1 / 1;
-            border: 4px solid #1a1a1a;
+        100% {
+          transform: rotate(45deg) translateX(100%);
         }
-        .ludo-path {
-            display: grid;
-            grid-template-columns: repeat(6, 1fr);
-            grid-template-rows: repeat(3, 1fr);
+      }
+      .card {
+        perspective: 1000px;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+      .card:hover {
+        transform: translateY(-8px) scale(1.05);
+        filter: drop-shadow(0 20px 25px rgba(0, 0, 0, 0.3));
+      }
+      .card-inner {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        transform-style: preserve-3d;
+      }
+      .card.flipped .card-inner {
+        transform: rotateY(180deg);
+      }
+      .card-tooltip {
+        position: absolute;
+        top: -50px;
+        left: 50%;
+        transform: translateX(-50%) translateY(10px);
+        background: linear-gradient(135deg, #ff6b6b, #ff8e53);
+        color: white;
+        padding: 12px 16px;
+        border-radius: 12px;
+        font-size: 13px;
+        font-weight: 600;
+        white-space: nowrap;
+        opacity: 0;
+        pointer-events: none;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        z-index: 10;
+        box-shadow: 0 8px 25px rgba(255, 107, 107, 0.4);
+        border: 2px solid rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(10px);
+      }
+      .card-tooltip::after {
+        content: "";
+        position: absolute;
+        top: 100%;
+        left: 50%;
+        transform: translateX(-50%);
+        border: 8px solid transparent;
+        border-top-color: #ff6b6b;
+      }
+      .card:hover .card-tooltip {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+      }
+      .card-front {
+        object-fit: fill;
+        /* background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); */
+        box-shadow: inset 0 0 20px rgba(255, 255, 255, 0.1);
+      }
+      .card:hover .card-front {
+        box-shadow: inset 0 0 30px rgba(255, 255, 255, 0.2),
+          0 0 20px rgba(102, 126, 234, 0.4);
+      }
+      .dice-roll {
+        animation: diceRoll 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+      .dice-bounce {
+        animation: diceBounce 0.6s ease-in-out;
+      }
+      @keyframes diceRoll {
+        0% {
+          transform: rotate(0deg) scale(1) translateY(0);
+          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         }
-        .ludo-path-vertical {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            grid-template-rows: repeat(6, 1fr);
+        10% {
+          transform: rotate(36deg) scale(1.1) translateY(-5px);
+          box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
         }
-        .pawn {
-            width: 70%;
-            height: 70%;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: bold;
-            box-shadow: 
-                0 4px 8px rgba(0, 0, 0, 0.3),
-                inset 0 2px 4px rgba(255, 255, 255, 0.3);
-            border: 3px solid white;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            overflow: hidden;
+        20% {
+          transform: rotate(72deg) scale(0.9) translateY(0);
+          box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
         }
-        .pawn::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
-            transform: rotate(45deg);
-            transition: all 0.6s ease;
-            opacity: 0;
+        30% {
+          transform: rotate(108deg) scale(1.2) translateY(-8px);
+          box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
         }
-        .card:hover .pawn {
-            transform: scale(1.1) rotate(5deg);
-            box-shadow: 
-                0 8px 16px rgba(0, 0, 0, 0.4),
-                inset 0 2px 4px rgba(255, 255, 255, 0.4),
-                0 0 20px rgba(255, 255, 255, 0.3);
+        40% {
+          transform: rotate(144deg) scale(0.8) translateY(0);
+          box-shadow: 0 12px 24px rgba(0, 0, 0, 0.6);
         }
-        .card:hover .pawn::before {
-            opacity: 1;
-            animation: shimmer 1.5s ease-in-out infinite;
+        50% {
+          transform: rotate(180deg) scale(1.3) translateY(-10px);
+          box-shadow: 0 14px 28px rgba(0, 0, 0, 0.7);
         }
-        @keyframes shimmer {
-            0% { transform: rotate(45deg) translateX(-100%); }
-            100% { transform: rotate(45deg) translateX(100%); }
+        60% {
+          transform: rotate(216deg) scale(0.7) translateY(0);
+          box-shadow: 0 12px 24px rgba(0, 0, 0, 0.6);
         }
-        .card {
-            perspective: 1000px;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        70% {
+          transform: rotate(252deg) scale(1.1) translateY(-6px);
+          box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
         }
-        .card:hover {
-            transform: translateY(-8px) scale(1.05);
-            filter: drop-shadow(0 20px 25px rgba(0, 0, 0, 0.3));
+        80% {
+          transform: rotate(288deg) scale(0.9) translateY(0);
+          box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
         }
-        .card-inner {
-            position: relative;
-            width: 100%;
-            height: 100%;
-            transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-            transform-style: preserve-3d;
+        90% {
+          transform: rotate(324deg) scale(1.05) translateY(-3px);
+          box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
         }
-        .card.flipped .card-inner {
-            transform: rotateY(180deg);
+        100% {
+          transform: rotate(360deg) scale(1) translateY(0);
+          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         }
-        .card-tooltip {
-            position: absolute;
-            top: -50px;
-            left: 50%;
-            transform: translateX(-50%) translateY(10px);
-            background: linear-gradient(135deg, #ff6b6b, #ff8e53);
-            color: white;
-            padding: 12px 16px;
-            border-radius: 12px;
-            font-size: 13px;
-            font-weight: 600;
-            white-space: nowrap;
-            opacity: 0;
-            pointer-events: none;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            z-index: 10;
-            box-shadow: 0 8px 25px rgba(255, 107, 107, 0.4);
-            border: 2px solid rgba(255, 255, 255, 0.2);
-            backdrop-filter: blur(10px);
+      }
+      @keyframes diceBounce {
+        0% {
+          transform: scale(1);
         }
-        .card-tooltip::after {
-            content: '';
-            position: absolute;
-            top: 100%;
-            left: 50%;
-            transform: translateX(-50%);
-            border: 8px solid transparent;
-            border-top-color: #ff6b6b;
+        50% {
+          transform: scale(1.2);
         }
-        .card:hover .card-tooltip {
-            opacity: 1;
-            transform: translateX(-50%) translateY(0);
+        100% {
+          transform: scale(1);
         }
-        .card-front {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            box-shadow: inset 0 0 20px rgba(255, 255, 255, 0.1);
+      }
+      #rollDiceBtn {
+        background: linear-gradient(135deg, #ff6b6b, #ff8e53);
+        border: 2px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3),
+          inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        position: relative;
+        overflow: hidden;
+      }
+      #rollDiceBtn::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(255, 255, 255, 0.2),
+          transparent
+        );
+        transition: left 0.5s;
+      }
+      #rollDiceBtn:hover::before {
+        left: 100%;
+      }
+      #rollDiceBtn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(255, 107, 107, 0.4),
+          inset 0 1px 0 rgba(255, 255, 255, 0.3);
+      }
+      .card-front,
+      .card-back {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        -webkit-backface-visibility: hidden;
+        backface-visibility: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 0.25rem;
+      }
+      .card-back {
+        transform: rotateY(180deg);
+        padding: 16px;
+        text-align: center;
+        font-size: 14px;
+        line-height: 1.4;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        box-shadow: inset 0 0 30px rgba(255, 255, 255, 0.1),
+          0 0 20px rgba(102, 126, 234, 0.3);
+        border: 2px solid rgba(255, 255, 255, 0.2);
+        position: relative;
+        overflow: hidden;
+      }
+      .card-back::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(
+          45deg,
+          transparent 30%,
+          rgba(255, 255, 255, 0.1) 50%,
+          transparent 70%
+        );
+        animation: scanline 2s linear infinite;
+      }
+      .card-back h3 {
+        font-size: 18px;
+        margin-bottom: 12px;
+        font-weight: 800;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        color: #fff;
+        position: relative;
+        z-index: 2;
+      }
+      .card-back p {
+        font-size: 14px;
+        line-height: 1.4;
+        color: #f0f0f0;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+        position: relative;
+        z-index: 2;
+      }
+      @keyframes scanline {
+        0% {
+          transform: translateX(-100%);
         }
-        .card:hover .card-front {
-            box-shadow: 
-                inset 0 0 30px rgba(255, 255, 255, 0.2),
-                0 0 20px rgba(102, 126, 234, 0.4);
+        100% {
+          transform: translateX(100%);
         }
-        .dice-roll {
-            animation: diceRoll 1.5s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .dice-bounce {
-            animation: diceBounce 0.6s ease-in-out;
-        }
-        @keyframes diceRoll {
-            0% { 
-                transform: rotate(0deg) scale(1) translateY(0);
-                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            }
-            10% { 
-                transform: rotate(36deg) scale(1.1) translateY(-5px);
-                box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
-            }
-            20% { 
-                transform: rotate(72deg) scale(0.9) translateY(0);
-                box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
-            }
-            30% { 
-                transform: rotate(108deg) scale(1.2) translateY(-8px);
-                box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
-            }
-            40% { 
-                transform: rotate(144deg) scale(0.8) translateY(0);
-                box-shadow: 0 12px 24px rgba(0, 0, 0, 0.6);
-            }
-            50% { 
-                transform: rotate(180deg) scale(1.3) translateY(-10px);
-                box-shadow: 0 14px 28px rgba(0, 0, 0, 0.7);
-            }
-            60% { 
-                transform: rotate(216deg) scale(0.7) translateY(0);
-                box-shadow: 0 12px 24px rgba(0, 0, 0, 0.6);
-            }
-            70% { 
-                transform: rotate(252deg) scale(1.1) translateY(-6px);
-                box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
-            }
-            80% { 
-                transform: rotate(288deg) scale(0.9) translateY(0);
-                box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
-            }
-            90% { 
-                transform: rotate(324deg) scale(1.05) translateY(-3px);
-                box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
-            }
-            100% { 
-                transform: rotate(360deg) scale(1) translateY(0);
-                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            }
-        }
-        @keyframes diceBounce {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.2); }
-            100% { transform: scale(1); }
-        }
-        #rollDiceBtn {
-            background: linear-gradient(135deg, #ff6b6b, #ff8e53);
-            border: 2px solid rgba(255, 255, 255, 0.2);
-            box-shadow: 
-                0 4px 15px rgba(255, 107, 107, 0.3),
-                inset 0 1px 0 rgba(255, 255, 255, 0.2);
-            position: relative;
-            overflow: hidden;
-        }
-        #rollDiceBtn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-            transition: left 0.5s;
-        }
-        #rollDiceBtn:hover::before {
-            left: 100%;
-        }
-        #rollDiceBtn:hover {
-            transform: translateY(-2px);
-            box-shadow: 
-                0 8px 25px rgba(255, 107, 107, 0.4),
-                inset 0 1px 0 rgba(255, 255, 255, 0.3);
-        }
-        .card-front,
-        .card-back {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            -webkit-backface-visibility: hidden;
-            backface-visibility: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 0.25rem;
-        }
-        .card-back {
-            transform: rotateY(180deg);
-            padding: 16px;
-            text-align: center;
-            font-size: 14px;
-            line-height: 1.4;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            box-shadow: 
-                inset 0 0 30px rgba(255, 255, 255, 0.1),
-                0 0 20px rgba(102, 126, 234, 0.3);
-            border: 2px solid rgba(255, 255, 255, 0.2);
-            position: relative;
-            overflow: hidden;
-        }
-        .card-back::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.1) 50%, transparent 70%);
-            animation: scanline 2s linear infinite;
-        }
-        .card-back h3 {
-            font-size: 18px;
-            margin-bottom: 12px;
-            font-weight: 800;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-            color: #fff;
-            position: relative;
-            z-index: 2;
-        }
-        .card-back p {
-            font-size: 14px;
-            line-height: 1.4;
-            color: #f0f0f0;
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
-            position: relative;
-            z-index: 2;
-        }
-        @keyframes scanline {
-            0% { transform: translateX(-100%); }
-            100% { transform: translateX(100%); }
-        }
+      }
     </style>
 </head>
 
-<body class="font-display text-stone-800 dark:text-stone-200"
-    style="background: linear-gradient(135deg, #100D2B 0%, #29274F 100%); min-height: 100vh;">
-    <div class="relative flex h-auto min-h-screen w-full flex-col">
-        <header
-            class="flex items-center justify-between whitespace-nowrap border-b-2 border-yellow-400 px-6 sm:px-10 py-4"
-            style="background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05)); backdrop-filter: blur(10px);">
-            <div class="flex items-center gap-3">
-                <div
-                    class="w-10 h-10 rounded-full bg-gradient-to-br from-red-500 to-red-600 flex items-center justify-center text-white font-bold text-xl shadow-lg border-2 border-yellow-400 animate-pulse">
-                    L</div>
-                <h2 class="text-white text-2xl font-bold text-shadow-lg"
-                    style="text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);">LUDO FUN</h2>
+<body class="font-display text-stone-800 dark:text-stone-200" style="
+      background: linear-gradient(135deg, #100d2b 0%, #29274f 100%);
+      min-height: 100vh;
+    ">
+  <div class="relative flex h-auto min-h-screen w-full flex-col">
+    <header class="flex items-center justify-between whitespace-nowrap border-b-2 border-yellow-400 px-6 sm:px-10 py-4"
+      style="
+          background: linear-gradient(
+            135deg,
+            rgba(255, 255, 255, 0.1),
+            rgba(255, 255, 255, 0.05)
+          );
+          backdrop-filter: blur(10px);
+        ">
+      <div class="flex items-center gap-3">
+        <img src="bg-colors.jpg" alt="Ludo Icon" class="w-24 h-24 object-cover shadow-lg border-3 border-yellow-400" />
+        <h2 class="text-white text-2xl font-bold text-shadow-lg" style="text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5)">
+          LUDO TRIVIA
+        </h2>
+      </div>
+      <div class="flex items-center gap-4">
+        <button
+          class="flex items-center justify-center rounded-full h-10 w-10 bg-primary/20 dark:bg-primary/30 text-stone-800 dark:text-white">
+          <span class="material-symbols-outlined">help</span>
+        </button>
+        <div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10" style="
+              background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBoxsIsifl6BoKHO-zFS4ofSf1fxcDtjV0UUCO9HIuq3gKij9Mr6RxdJ6-DvFlY__0UFKwuhcWOZEmvdN4xHetHBY-4d3ektELgWgE4rvuRBuKDlsbhTzwABDYNEh1uKWr6m_uPIfjdeVaLY6F4HQclW1fYV4UHugGTaUltRa27hroWymAUk3Z0lXwh43KaJ7wYBNyAbVC30O9lJONYkVuVNUth5FgIOA7KV64p1BzPQ-qOtLvnnwG6LeNCQ2neLgdEelaR4IzeObQg');
+            "></div>
+      </div>
+    </header>
+    <main class="flex flex-col items-center justify-center p-4 sm:p-8 md:p-12 lg:p-16 flex-1">
+      <div class="ludo-board">
+        <div class="bg-red-500 flex items-center justify-center p-4">
+          <div class="w-full h-full bg-white/50 rounded-lg grid grid-cols-2 grid-rows-2 gap-2 p-2">
+            <div class="flex items-center justify-center">
+              <div class="pawn bg-red-500">1</div>
             </div>
-            <div class="flex items-center gap-4">
-                <button
-                    class="flex items-center justify-center rounded-full h-10 w-10 bg-primary/20 dark:bg-primary/30 text-stone-800 dark:text-white">
-                    <span class="material-symbols-outlined">help</span>
-                </button>
-                <div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10"
-                    style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBoxsIsifl6BoKHO-zFS4ofSf1fxcDtjV0UUCO9HIuq3gKij9Mr6RxdJ6-DvFlY__0UFKwuhcWOZEmvdN4xHetHBY-4d3ektELgWgE4rvuRBuKDlsbhTzwABDYNEh1uKWr6m_uPIfjdeVaLY6F4HQclW1fYV4UHugGTaUltRa27hroWymAUk3Z0lXwh43KaJ7wYBNyAbVC30O9lJONYkVuVNUth5FgIOA7KV64p1BzPQ-qOtLvnnwG6LeNCQ2neLgdEelaR4IzeObQg");'>
-                </div>
+            <div class="flex items-center justify-center">
+              <div class="pawn bg-red-500">2</div>
             </div>
-        </header>
-        <main class="flex flex-col items-center justify-center p-4 sm:p-8 md:p-12 lg:p-16 flex-1">
-            <div class="ludo-board">
-                <div class="bg-red-500 flex items-center justify-center p-4">
-                    <div class="w-full h-full bg-white/50 rounded-lg grid grid-cols-2 grid-rows-2 gap-2 p-2">
-                        <div class="flex items-center justify-center">
-                            <div class="pawn bg-red-500">1</div>
-                        </div>
-                        <div class="flex items-center justify-center">
-                            <div class="pawn bg-red-500">2</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="ludo-path-vertical bg-gray-200 dark:bg-gray-700">
-                    <div class="border border-gray-300 dark:border-gray-600"></div>
-                    <div class="border border-gray-300 dark:border-gray-600"></div>
-                    <div class="border border-gray-300 dark:border-gray-600 bg-blue-500"></div>
-                    <div class="border border-gray-300 dark:border-gray-600"></div>
-                    <div class="border border-gray-300 dark:border-gray-600 bg-blue-500"></div>
-                    <div class="border border-gray-300 dark:border-gray-600"></div>
-                    <div class="border border-gray-300 dark:border-gray-600 bg-blue-500"></div>
-                    <div class="border border-gray-300 dark:border-gray-600 bg-blue-500"></div>
-                    <div class="border border-gray-300 dark:border-gray-600 bg-blue-500"></div>
-                    <div class="border border-gray-300 dark:border-gray-600"></div>
-                    <div class="border border-gray-300 dark:border-gray-600"></div>
-                    <div class="border border-gray-300 dark:border-gray-600"></div>
-                    <div class="border border-gray-300 dark:border-gray-600"></div>
-                    <div class="border border-gray-300 dark:border-gray-600"></div>
-                    <div class="border border-gray-300 dark:border-gray-600"></div>
-                    <div class="border border-gray-300 dark:border-gray-600 flex items-center justify-center"><span
-                            class="material-symbols-outlined text-gray-500 text-lg">star</span></div>
-                    <div class="border border-gray-300 dark:border-gray-600"></div>
-                    <div class="border border-gray-300 dark:border-gray-600"></div>
-                </div>
-                <div class="bg-blue-500 flex items-center justify-center p-4">
-                    <div class="w-full h-full bg-white/50 rounded-lg grid grid-cols-2 grid-rows-2 gap-2 p-2">
-                        <div class="flex items-center justify-center">
-                            <div class="pawn bg-blue-500">3</div>
-                        </div>
-                        <div class="flex items-center justify-center">
-                            <div class="pawn bg-blue-500">4</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="ludo-path bg-gray-200 dark:bg-gray-700">
-                    <div class="border border-gray-300 dark:border-gray-600"></div>
-                    <div class="border border-gray-300 dark:border-gray-600 bg-red-500"></div>
-                    <div class="border border-gray-300 dark:border-gray-600"></div>
-                    <div class="border border-gray-300 dark:border-gray-600"></div>
-                    <div class="border border-gray-300 dark:border-gray-600"></div>
-                    <div class="border border-gray-300 dark:border-gray-600"></div>
-                    <div class="border border-gray-300 dark:border-gray-600"></div>
-                    <div class="border border-gray-300 dark:border-gray-600 bg-red-500"></div>
-                    <div class="border border-gray-300 dark:border-gray-600 bg-red-500"></div>
-                    <div class="border border-gray-300 dark:border-gray-600 bg-red-500"></div>
-                    <div class="border border-gray-300 dark:border-gray-600 bg-red-500"></div>
-                    <div class="border border-gray-300 dark:border-gray-600 bg-red-500"></div>
-                    <div class="border border-gray-300 dark:border-gray-600"></div>
-                    <div class="border border-gray-300 dark:border-gray-600"></div>
-                    <div class="border border-gray-300 dark:border-gray-600"></div>
-                    <div class="border border-gray-300 dark:border-gray-600"></div>
-                    <div class="border border-gray-300 dark:border-gray-600 flex items-center justify-center"><span
-                            class="material-symbols-outlined text-gray-500 text-lg">star</span></div>
-                    <div class="border border-gray-300 dark:border-gray-600"></div>
-                </div>
-                <div class="bg-primary/20 flex flex-col items-center justify-center p-4 relative">
-                    <div class="absolute top-0 left-0 w-full h-full" style="background: 
-                        linear-gradient(to top right, #f44336 49.5%, transparent 50%) top left / 50% 50% no-repeat,
-                        linear-gradient(to top left, #4caf50 49.5%, transparent 50%) top right / 50% 50% no-repeat,
-                        linear-gradient(to bottom right, #2196f3 49.5%, transparent 50%) bottom left / 50% 50% no-repeat,
-                        linear-gradient(to bottom left, #ffeb3b 49.5%, transparent 50%) bottom right / 50% 50% no-repeat;
-                    "></div>
-                    <div class="relative flex flex-col items-center justify-center gap-2 z-10">
-                        <div id="diceContainer"
-                            class="w-20 h-20 bg-white dark:bg-stone-800 rounded-lg flex items-center justify-center text-6xl font-bold text-stone-900 dark:text-white shadow-inner relative overflow-hidden">
-                            <span id="diceIcon" class="material-symbols-outlined !text-6xl">casino</span>
-                            <div id="diceNumber"
-                                class="absolute inset-0 flex items-center justify-center text-4xl font-bold text-red-600 bg-white rounded-lg opacity-0 transition-opacity duration-300">
-                                <span id="numberDisplay">?</span>
-                            </div>
-                        </div>
-                        <button id="rollDiceBtn"
-                            class="flex items-center justify-center w-full cursor-pointer overflow-hidden rounded-md h-10 px-4 bg-primary text-stone-900 text-sm font-bold shadow-md transition-transform hover:scale-105">
-                            <span class="truncate">Roll Dice</span>
-                        </button>
-                    </div>
-                </div>
-                <div class="ludo-path bg-gray-200 dark:bg-gray-700">
-                    <div class="border border-gray-300 dark:border-gray-600"></div>
-                    <div class="border border-gray-300 dark:border-gray-600 flex items-center justify-center"><span
-                            class="material-symbols-outlined text-gray-500 text-lg">star</span></div>
-                    <div class="border border-gray-300 dark:border-gray-600"></div>
-                    <div class="border border-gray-300 dark:border-gray-600"></div>
-                    <div class="border border-gray-300 dark:border-gray-600"></div>
-                    <div class="border border-gray-300 dark:border-gray-600"></div>
-                    <div class="border border-gray-300 dark:border-gray-600 bg-yellow-500"></div>
-                    <div class="border border-gray-300 dark:border-gray-600 bg-yellow-500"></div>
-                    <div class="border border-gray-300 dark:border-gray-600 bg-yellow-500"></div>
-                    <div class="border border-gray-300 dark:border-gray-600 bg-yellow-500"></div>
-                    <div class="border border-gray-300 dark:border-gray-600 bg-yellow-500"></div>
-                    <div class="border border-gray-300 dark:border-gray-600"></div>
-                    <div class="border border-gray-300 dark:border-gray-600"></div>
-                    <div class="border border-gray-300 dark:border-gray-600"></div>
-                    <div class="border border-gray-300 dark:border-gray-600"></div>
-                    <div class="border border-gray-300 dark:border-gray-600 bg-yellow-500"></div>
-                    <div class="border border-gray-300 dark:border-gray-600"></div>
-                    <div class="border border-gray-300 dark:border-gray-600"></div>
-                </div>
-                <div class="bg-green-500 flex items-center justify-center p-4">
-                    <div class="w-full h-full bg-white/50 rounded-lg grid grid-cols-2 grid-rows-2 gap-2 p-2">
-                        <div class="flex items-center justify-center">
-                            <div class="pawn bg-green-500">7</div>
-                        </div>
-                        <div class="flex items-center justify-center">
-                            <div class="pawn bg-green-500">8</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="ludo-path-vertical bg-gray-200 dark:bg-gray-700">
-                    <div class="border border-gray-300 dark:border-gray-600"></div>
-                    <div class="border border-gray-300 dark:border-gray-600 bg-green-500"></div>
-                    <div class="border border-gray-300 dark:border-gray-600 flex items-center justify-center"><span
-                            class="material-symbols-outlined text-gray-500 text-lg">star</span></div>
-                    <div class="border border-gray-300 dark:border-gray-600 "></div>
-                    <div class="border border-gray-300 dark:border-gray-600 bg-green-500"></div>
-                    <div class="border border-gray-300 dark:border-gray-600"></div>
-                    <div class="border border-gray-300 dark:border-gray-600"></div>
-                    <div class="border border-gray-300 dark:border-gray-600 bg-green-500"></div>
-                    <div class="border border-gray-300 dark:border-gray-600"></div>
-                    <div class="border border-gray-300 dark:border-gray-600 "></div>
-                    <div class="border border-gray-300 dark:border-gray-600 bg-green-500"></div>
-                    <div class="border border-gray-300 dark:border-gray-600 "></div>
-                    <div class="border border-gray-300 dark:border-gray-600 bg-green-500"></div>
-                    <div class="border border-gray-300 dark:border-gray-600 bg-green-500"></div>
-                    <div class="border border-gray-300 dark:border-gray-600"></div>
-                    <div class="border border-gray-300 dark:border-gray-600 "></div>
-                    <div class="border border-gray-300 dark:border-gray-600"></div>
-                    <div class="border border-gray-300 dark:border-gray-600"></div>
-                </div>
-                <div class="bg-yellow-500 flex items-center justify-center p-4">
-                    <div class="w-full h-full bg-white/50 rounded-lg grid grid-cols-2 grid-rows-2 gap-2 p-2">
-                        <div class="flex items-center justify-center">
-                            <div class="pawn bg-yellow-500 text-stone-800">5</div>
-                        </div>
-                        <div class="flex items-center justify-center">
-                            <div class="pawn bg-yellow-500 text-stone-800">6</div>
-                        </div>
-                    </div>
-                </div>
+          </div>
+        </div>
+        <div class="ludo-path-vertical bg-gray-200 dark:bg-gray-700">
+          <div class="border border-gray-300 dark:border-gray-600"></div>
+          <div class="border border-gray-300 dark:border-gray-600"></div>
+          <div class="border border-gray-300 dark:border-gray-600"></div>
+          <div class="border border-gray-300 dark:border-gray-600"></div>
+          <div class="border border-gray-300 dark:border-gray-600 bg-blue-500"></div>
+          <div class="border border-gray-300 dark:border-gray-600 bg-blue-500"></div>
+          <div class="border border-gray-300 dark:border-gray-600 flex items-center justify-center">
+            <span class="material-symbols-outlined text-gray-500 text-lg">star</span>
+          </div>
+          <div class="border border-gray-300 dark:border-gray-600 bg-blue-500"></div>
+          <div class="border border-gray-300 dark:border-gray-600"></div>
+          <div class="border border-gray-300 dark:border-gray-600"></div>
+          <div class="border border-gray-300 dark:border-gray-600 bg-blue-500"></div>
+          <div class="border border-gray-300 dark:border-gray-600"></div>
+          <div class="border border-gray-300 dark:border-gray-600"></div>
+          <div class="border border-gray-300 dark:border-gray-600 bg-blue-500"></div>
+          <div class="border border-gray-300 dark:border-gray-600"></div>
+          <div class="border border-gray-300 dark:border-gray-600 flex items-center justify-center"></div>
+          <div class="border border-gray-300 dark:border-gray-600 bg-blue-500"></div>
+          <div class="border border-gray-300 dark:border-gray-600"></div>
+        </div>
+        <div class="bg-blue-500 flex items-center justify-center p-4">
+          <div class="w-full h-full bg-white/50 rounded-lg grid grid-cols-2 grid-rows-2 gap-2 p-2">
+            <div class="flex items-center justify-center">
+              <div class="pawn bg-blue-500">3</div>
             </div>
+            <div class="flex items-center justify-center">
+              <div class="pawn bg-blue-500">4</div>
+            </div>
+          </div>
+        </div>
+        <div class="ludo-path bg-gray-200 dark:bg-gray-700">
+          <div class="border border-gray-300 dark:border-gray-600"></div>
+          <div class="border border-gray-300 dark:border-gray-600 bg-red-500"></div>
+          <div class="border border-gray-300 dark:border-gray-600"></div>
+          <div class="border border-gray-300 dark:border-gray-600"></div>
+          <div class="border border-gray-300 dark:border-gray-600"></div>
+          <div class="border border-gray-300 dark:border-gray-600"></div>
+          <div class="border border-gray-300 dark:border-gray-600"></div>
+          <div class="border border-gray-300 dark:border-gray-600 bg-red-500"></div>
+          <div class="border border-gray-300 dark:border-gray-600 bg-red-500"></div>
+          <div class="border border-gray-300 dark:border-gray-600 bg-red-500"></div>
+          <div class="border border-gray-300 dark:border-gray-600 bg-red-500"></div>
+          <div class="border border-gray-300 dark:border-gray-600 bg-red-500"></div>
+          <div class="border border-gray-300 dark:border-gray-600"></div>
+          <div class="border border-gray-300 dark:border-gray-600"></div>
+          <div class="border border-gray-300 dark:border-gray-600 flex items-center justify-center">
+            <span class="material-symbols-outlined text-gray-500 text-lg">star</span>
+          </div>
+          <div class="border border-gray-300 dark:border-gray-600"></div>
+          <div class="border border-gray-300 dark:border-gray-600 flex items-center justify-center"></div>
+          <div class="border border-gray-300 dark:border-gray-600"></div>
+        </div>
+        <div class="bg-primary/20 flex flex-col items-center justify-center p-4 relative">
+          <div class="absolute top-0 left-0 w-full h-full" style="
+                background: linear-gradient(
+                      to top right,
+                      #f44336 49.5%,
+                      transparent 50%
+                    )
+                    top left / 50% 50% no-repeat,
+                  linear-gradient(to top left, #4caf50 49.5%, transparent 50%)
+                    top right / 50% 50% no-repeat,
+                  linear-gradient(
+                      to bottom right,
+                      #2196f3 49.5%,
+                      transparent 50%
+                    )
+                    bottom left / 50% 50% no-repeat,
+                  linear-gradient(
+                      to bottom left,
+                      #ffeb3b 49.5%,
+                      transparent 50%
+                    )
+                    bottom right / 50% 50% no-repeat;
+              "></div>
+          <div class="relative flex flex-col items-center justify-center gap-2 z-10">
+            <div id="diceContainer"
+              class="w-20 h-20 bg-white dark:bg-stone-800 rounded-lg flex items-center justify-center text-6xl font-bold text-stone-900 dark:text-white shadow-inner relative overflow-hidden">
+              <span id="diceIcon" class="material-symbols-outlined !text-6xl">casino</span>
+              <div id="diceNumber"
+                class="absolute inset-0 flex items-center justify-center text-4xl font-bold text-red-600 bg-white rounded-lg opacity-0 transition-opacity duration-300">
+                <span id="numberDisplay">?</span>
+              </div>
+            </div>
+            <button id="rollDiceBtn"
+              class="flex items-center justify-center w-full cursor-pointer overflow-hidden rounded-md h-10 px-4 bg-primary text-stone-900 text-sm font-bold shadow-md transition-transform hover:scale-105">
+              <span class="truncate">Roll Dice</span>
+            </button>
+          </div>
+        </div>
+        <div class="ludo-path bg-gray-200 dark:bg-gray-700">
+          <div class="border border-gray-300 dark:border-gray-600"></div>
+          <div class="border border-gray-300 dark:border-gray-600 flex items-center justify-center"></div>
+          <div class="border border-gray-300 dark:border-gray-600"></div>
+          <div class="border border-gray-300 dark:border-gray-600 flex items-center justify-center">
+            <span class="material-symbols-outlined text-gray-500 text-lg">star</span>
+          </div>
+          <div class="border border-gray-300 dark:border-gray-600"></div>
+          <div class="border border-gray-300 dark:border-gray-600"></div>
+          <div class="border border-gray-300 dark:border-gray-600 bg-yellow-500"></div>
+          <div class="border border-gray-300 dark:border-gray-600 bg-yellow-500"></div>
+          <div class="border border-gray-300 dark:border-gray-600 bg-yellow-500"></div>
+          <div class="border border-gray-300 dark:border-gray-600 bg-yellow-500"></div>
+          <div class="border border-gray-300 dark:border-gray-600 bg-yellow-500"></div>
+          <div class="border border-gray-300 dark:border-gray-600"></div>
+          <div class="border border-gray-300 dark:border-gray-600"></div>
+          <div class="border border-gray-300 dark:border-gray-600"></div>
+          <div class="border border-gray-300 dark:border-gray-600"></div>
+          <div class="border border-gray-300 dark:border-gray-600"></div>
+          <div class="border border-gray-300 dark:border-gray-600 bg-yellow-500"></div>
+          <div class="border border-gray-300 dark:border-gray-600"></div>
+        </div>
+        <div class="bg-green-500 flex items-center justify-center p-4">
+          <div class="w-full h-full bg-white/50 rounded-lg grid grid-cols-2 grid-rows-2 gap-2 p-2">
+            <div class="flex items-center justify-center">
+              <div class="pawn bg-green-500">7</div>
+            </div>
+            <div class="flex items-center justify-center">
+              <div class="pawn bg-green-500">8</div>
+            </div>
+          </div>
+        </div>
+        <div class="ludo-path-vertical bg-gray-200 dark:bg-gray-700">
+          <div class="border border-gray-300 dark:border-gray-600"></div>
+          <div class="border border-gray-300 dark:border-gray-600 bg-green-500"></div>
+          <div class="border border-gray-300 dark:border-gray-600 flex items-center justify-center"></div>
+          <div class="border border-gray-300 dark:border-gray-600"></div>
+          <div class="border border-gray-300 dark:border-gray-600 bg-green-500"></div>
+          <div class="border border-gray-300 dark:border-gray-600"></div>
+          <div class="border border-gray-300 dark:border-gray-600"></div>
+          <div class="border border-gray-300 dark:border-gray-600 bg-green-500"></div>
+          <div class="border border-gray-300 dark:border-gray-600"></div>
+          <div class="border border-gray-300 dark:border-gray-600"></div>
+          <div class="border border-gray-300 dark:border-gray-600 bg-green-500"></div>
+          <div class="border border-gray-300 dark:border-gray-600 flex items-center justify-center">
+            <span class="material-symbols-outlined text-gray-500 text-lg">star</span>
+          </div>
+          <div class="border border-gray-300 dark:border-gray-600 bg-green-500"></div>
+          <div class="border border-gray-300 dark:border-gray-600 bg-green-500"></div>
+          <div class="border border-gray-300 dark:border-gray-600"></div>
+          <div class="border border-gray-300 dark:border-gray-600"></div>
+          <div class="border border-gray-300 dark:border-gray-600"></div>
+          <div class="border border-gray-300 dark:border-gray-600"></div>
+        </div>
+        <div class="bg-yellow-500 flex items-center justify-center p-4">
+          <div class="w-full h-full bg-white/50 rounded-lg grid grid-cols-2 grid-rows-2 gap-2 p-2">
+            <div class="flex items-center justify-center">
+              <div class="pawn bg-yellow-500 text-stone-800">5</div>
+            </div>
+            <div class="flex items-center justify-center">
+              <div class="pawn bg-yellow-500 text-stone-800">6</div>
+            </div>
+          </div>
+        </div>
+      </div>
 
-            <div class="w-full max-w-6xl mt-8 grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4">
-                <div class="card h-40 relative" onclick="flipCard(this)">
-                    <div class="card-tooltip">What's your favorite childhood memory?</div>
-                    <div class="card-inner">
-                        <div class="card-front bg-red-500 p-2 flex flex-col justify-center items-center bg-cover bg-center"
-                            style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAmA_ZpvCLjq2LaGNgmaeZNZDQTy7tvb8A04pZY9kUGipxa5Ngwlc4oelBj3_MkdHDcj4xsuTqPT0PJdaE7yWlyKyNuleNvLspgeWcYfHADwpPBMrdyDtG467HKtzQuDndd4UOJEEO_Soz8rqnNd95ii_5pvB3W03bJpyu0G-BprKf6IheRredMIyjMmzz1e9sMVuojKD4S92GBGuqp59HijCQnKogGZhnUqz6FdOCUlJiRvTiVFJRWAD9oqOWU2smPudNHpHxjb11A')">
-                            <div class="pawn bg-red-500 !w-12 !h-12 text-xl">1</div>
-                        </div>
-                        <div class="card-back bg-red-600 text-white">
-                            <h3 class="font-bold">Dare</h3>
-                            <p>Do your best impression of a famous person!</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="card h-40 relative" onclick="flipCard(this)">
-                    <div class="card-tooltip">What's the weirdest food combination you've ever tried?</div>
-                    <div class="card-inner">
-                        <div class="card-front bg-red-500 p-2 flex flex-col justify-center items-center bg-cover bg-center"
-                            style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAmA_ZpvCLjq2LaGNgmaeZNZDQTy7tvb8A04pZY9kUGipxa5Ngwlc4oelBj3_MkdHDcj4xsuTqPT0PJdaE7yWlyKyNuleNvLspgeWcYfHADwpPBMrdyDtG467HKtzQuDndd4UOJEEO_Soz8rqnNd95ii_5pvB3W03bJpyu0G-BprKf6IheRredMIyjMmzz1e9sMVuojKD4S92GBGuqp59HijCQnKogGZhnUqz6FdOCUlJiRvTiVFJRWAD9oqOWU2smPudNHpHxjb11A')">
-                            <div class="pawn bg-red-500 !w-12 !h-12 text-xl">2</div>
-                        </div>
-                        <div class="card-back bg-red-600 text-white">
-                            <h3 class="font-bold">Dare</h3>
-                            <p>Sing a song out loud!</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="card h-40 relative" onclick="flipCard(this)">
-                    <div class="card-tooltip">If you could have any superpower, what would it be?</div>
-                    <div class="card-inner">
-                        <div class="card-front bg-blue-500 p-2 flex flex-col justify-center items-center bg-cover bg-center"
-                            style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAmA_ZpvCLjq2LaGNgmaeZNZDQTy7tvb8A04pZY9kUGipxa5Ngwlc4oelBj3_MkdHDcj4xsuTqPT0PJdaE7yWlyKyNuleNvLspgeWcYfHADwpPBMrdyDtG467HKtzQuDndd4UOJEEO_Soz8rqnNd95ii_5pvB3W03bJpyu0G-BprKf6IheRredMIyjMmzz1e9sMVuojKD4S92GBGuqp59HijCQnKogGZhnUqz6FdOCUlJiRvTiVFJRWAD9oqOWU2smPudNHpHxjb11A')">
-                            <div class="pawn bg-blue-500 !w-12 !h-12 text-xl">3</div>
-                        </div>
-                        <div class="card-back bg-blue-600 text-white">
-                            <h3 class="font-bold">Dare</h3>
-                            <p>Do 10 jumping jacks while singing!</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="card h-40 relative" onclick="flipCard(this)">
-                    <div class="card-tooltip">What's the most embarrassing thing that's ever happened to you?</div>
-                    <div class="card-inner">
-                        <div class="card-front bg-blue-500 p-2 flex flex-col justify-center items-center bg-cover bg-center"
-                            style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAmA_ZpvCLjq2LaGNgmaeZNZDQTy7tvb8A04pZY9kUGipxa5Ngwlc4oelBj3_MkdHDcj4xsuTqPT0PJdaE7yWlyKyNuleNvLspgeWcYfHADwpPBMrdyDtG467HKtzQuDndd4UOJEEO_Soz8rqnNd95ii_5pvB3W03bJpyu0G-BprKf6IheRredMIyjMmzz1e9sMVuojKD4S92GBGuqp59HijCQnKogGZhnUqz6FdOCUlJiRvTiVFJRWAD9oqOWU2smPudNHpHxjb11A')">
-                            <div class="pawn bg-blue-500 !w-12 !h-12 text-xl">4</div>
-                        </div>
-                        <div class="card-back bg-blue-600 text-white">
-                            <h3 class="font-bold">Dare</h3>
-                            <p>Do 10 jumping jacks.</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="card h-40 relative" onclick="flipCard(this)">
-                    <div class="card-tooltip">What's your weirdest phobia or fear?</div>
-                    <div class="card-inner">
-                        <div class="card-front bg-yellow-500 p-2 flex flex-col justify-center items-center bg-cover bg-center"
-                            style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAmA_ZpvCLjq2LaGNgmaeZNZDQTy7tvb8A04pZY9kUGipxa5Ngwlc4oelBj3_MkdHDcj4xsuTqPT0PJdaE7yWlyKyNuleNvLspgeWcYfHADwpPBMrdyDtG467HKtzQuDndd4UOJEEO_Soz8rqnNd95ii_5pvB3W03bJpyu0G-BprKf6IheRredMIyjMmzz1e9sMVuojKD4S92GBGuqp59HijCQnKogGZhnUqz6FdOCUlJiRvTiVFJRWAD9oqOWU2smPudNHpHxjb11A')">
-                            <div class="pawn bg-yellow-500 text-stone-800 !w-12 !h-12 text-xl">5</div>
-                        </div>
-                        <div class="card-back bg-yellow-600 text-white">
-                            <h3 class="font-bold">Dare</h3>
-                            <p>Tell a dad joke.</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="card h-40 relative" onclick="flipCard(this)">
-                    <div class="card-tooltip">What's the strangest dream you've ever had?</div>
-                    <div class="card-inner">
-                        <div class="card-front bg-yellow-500 p-2 flex flex-col justify-center items-center bg-cover bg-center"
-                            style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAmA_ZpvCLjq2LaGNgmaeZNZDQTy7tvb8A04pZY9kUGipxa5Ngwlc4oelBj3_MkdHDcj4xsuTqPT0PJdaE7yWlyKyNuleNvLspgeWcYfHADwpPBMrdyDtG467HKtzQuDndd4UOJEEO_Soz8rqnNd95ii_5pvB3W03bJpyu0G-BprKf6IheRredMIyjMmzz1e9sMVuojKD4S92GBGuqp59HijCQnKogGZhnUqz6FdOCUlJiRvTiVFJRWAD9oqOWU2smPudNHpHxjb11A')">
-                            <div class="pawn bg-yellow-500 text-stone-800 !w-12 !h-12 text-xl">6</div>
-                        </div>
-                        <div class="card-back bg-yellow-600 text-white">
-                            <h3 class="font-bold">Dare</h3>
-                            <p>Dance like nobody's watching for 30 seconds!</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="card h-40 relative" onclick="flipCard(this)">
-                    <div class="card-tooltip">What's your dream vacation?</div>
-                    <div class="card-inner">
-                        <div class="card-front bg-green-500 p-2 flex flex-col justify-center items-center bg-cover bg-center"
-                            style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAmA_ZpvCLjq2LaGNgmaeZNZDQTy7tvb8A04pZY9kUGipxa5Ngwlc4oelBj3_MkdHDcj4xsuTqPT0PJdaE7yWlyKyNuleNvLspgeWcYfHADwpPBMrdyDtG467HKtzQuDndd4UOJEEO_Soz8rqnNd95ii_5pvB3W03bJpyu0G-BprKf6IheRredMIyjMmzz1e9sMVuojKD4S92GBGuqp59HijCQnKogGZhnUqz6FdOCUlJiRvTiVFJRWAD9oqOWU2smPudNHpHxjb11A')">
-                            <div class="pawn bg-green-500 !w-12 !h-12 text-xl">7</div>
-                        </div>
-                        <div class="card-back bg-green-600 text-white">
-                            <h3 class="font-bold">Dare</h3>
-                            <p>Speak in an accent for 1 minute.</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="card h-40 relative" onclick="flipCard(this)">
-                    <div class="card-tooltip">What's the most random thing you've ever bought?</div>
-                    <div class="card-inner">
-                        <div class="card-front bg-green-500 p-2 flex flex-col justify-center items-center bg-cover bg-center"
-                            style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAmA_ZpvCLjq2LaGNgmaeZNZDQTy7tvb8A04pZY9kUGipxa5Ngwlc4oelBj3_MkdHDcj4xsuTqPT0PJdaE7yWlyKyNuleNvLspgeWcYfHADwpPBMrdyDtG467HKtzQuDndd4UOJEEO_Soz8rqnNd95ii_5pvB3W03bJpyu0G-BprKf6IheRredMIyjMmzz1e9sMVuojKD4S92GBGuqp59HijCQnKogGZhnUqz6FdOCUlJiRvTiVFJRWAD9oqOWU2smPudNHpHxjb11A')">
-                            <div class="pawn bg-green-500 !w-12 !h-12 text-xl">8</div>
-                        </div>
-                        <div class="card-back bg-green-600 text-white">
-                            <h3 class="font-bold">Dare</h3>
-                            <p>Do your best robot dance!</p>
-                        </div>
-                    </div>
-                </div>
+      <div class="w-full max-w-6xl mt-8 grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4">
+        <div class="card h-40 relative" onclick="flipCard(this)">
+          <div class="card-tooltip">
+            What has a head and a tail but no body?
+          </div>
+          <div class="card-inner">
+            <div
+              class="card-front bg-red-500 p-2 flex flex-col justify-center items-center bg-cover bg-center image-container"
+              style="background-image: url(bg-colors.jpg)">
+              <div class="pawn bg-red-500 !w-12 !h-12 text-xl">1</div>
             </div>
-        </main>
-    </div>
+            <div class="card-back bg-red-600 text-white p-4 flex items-center justify-center text-center">
+              <p class="text-lg">Mimic your favorite artist or colleague for 30 seconds.</p>
+            </div>
+          </div>
+        </div>
+        <div class="card h-40 relative" onclick="flipCard(this)">
+          <div class="card-tooltip">
+            Which team organized Fiestea last time?
+          </div>
+          <div class="card-inner">
+            <div
+              class="card-front bg-red-500 p-2 flex flex-col justify-center items-center bg-cover bg-center image-container"
+              style="background-image: url(bg-colors.jpg)">
+              <div class="pawn bg-red-500 !w-12 !h-12 text-xl">2</div>
+            </div>
+            <div class="card-back bg-red-600 text-white p-4 flex items-center justify-center text-center">
+              <p class="text-lg">Politely propose a glass of water to someone on the call.</p>
+            </div>
+          </div>
+        </div>
+        <div class="card h-40 relative" onclick="flipCard(this)">
+          <div class="card-tooltip">
+            Name the gate which you can never enter?
+          </div>
+          <div class="card-inner">
+            <div
+              class="card-front bg-blue-500 p-2 flex flex-col justify-center items-center bg-cover bg-center image-container"
+              style="background-image: url(bg-colors.jpg)">
+              <div class="pawn bg-blue-500 !w-12 !h-12 text-xl">3</div>
+            </div>
+            <div class="card-back bg-blue-600 text-white p-4 flex items-center justify-center text-center">
+              <p class="text-lg">Sing any song in slow motion for 30 seconds.</p>
+            </div>
+          </div>
+        </div>
+        <div class="card h-40 relative" onclick="flipCard(this)">
+          <div class="card-tooltip">
+            How many square cards are there on a chessboard?
+          </div>
+          <div class="card-inner">
+            <div class="card-front bg-blue-500 p-2 flex flex-col justify-center items-center bg-cover bg-center"
+              style="background-image: url(bg-colors.jpg)">
+              <div class="pawn bg-blue-500 !w-12 !h-12 text-xl">4</div>
+            </div>
+            <div class="card-back bg-blue-600 text-white p-4 flex items-center justify-center text-center">
+              <p class="text-lg">Sing a Happy Birthday song for your favorite colleague on the call.</p>
+            </div>
+          </div>
+        </div>
+        <div class="card h-40 relative" onclick="flipCard(this)">
+          <div class="card-tooltip">It belongs to you, but your friends use it more. What is it?</div>
+          <div class="card-inner">
+            <div class="card-front bg-yellow-500 p-2 flex flex-col justify-center items-center bg-cover bg-center"
+              style="background-image: url(bg-colors.jpg)">
+              <div class="pawn bg-yellow-500 text-stone-800 !w-12 !h-12 text-xl">
+                5
+              </div>
+            </div>
+            <div class="card-back bg-yellow-600 text-white p-4 flex items-center justify-center text-center">
+              <p class="text-lg">Share your most awkward or memorable moment in Excelerate in 30 seconds.</p>
+            </div>
+          </div>
+        </div>
+        <div class="card h-40 relative" onclick="flipCard(this)">
+          <div class="card-tooltip">
+            According to official rules, can you end a game of UNO with a Draw Four card?
+          </div>
+          <div class="card-inner">
+            <div class="card-front bg-yellow-500 p-2 flex flex-col justify-center items-center bg-cover bg-center"
+              style="background-image: url(bg-colors.jpg)">
+              <div class="pawn bg-yellow-500 text-stone-800 !w-12 !h-12 text-xl">
+                6
+              </div>
+            </div>
+            <div class="card-back bg-yellow-600 text-white p-4 flex items-center justify-center text-center">
+              <p class="text-lg">Imagine you are Prime Minister for a day — which one law would you pass?</p>
+            </div>
+          </div>
+        </div>
+        <div class="card h-40 relative" onclick="flipCard(this)">
+          <div class="card-tooltip">When it's a player's turn in Snakes and Ladders, what must they do first?</div>
+          <div class="card-inner">
+            <div class="card-front bg-green-500 p-2 flex flex-col justify-center items-center bg-cover bg-center"
+              style="background-image: url(bg-colors.jpg)">
+              <div class="pawn bg-green-500 !w-12 !h-12 text-xl">7</div>
+            </div>
+            <div class="card-back bg-green-600 text-white p-4 flex items-center justify-center text-center">
+              <p class="text-lg">Complete a short, four-line poem using the words: Jonny, Twinkle, and Ringa Ringa.</p>
+            </div>
+          </div>
+        </div>
+        <div class="card h-40 relative" onclick="flipCard(this)">
+          <div class="card-tooltip">
+            What asks no questions but must be answered?
+          </div>
+          <div class="card-inner">
+            <div class="card-front bg-green-500 p-2 flex flex-col justify-center items-center bg-cover bg-center"
+              style="background-image: url(bg-colors.jpg)">
+              <div class="pawn bg-green-500 !w-12 !h-12 text-xl">8</div>
+            </div>
+            <div class="card-back bg-green-600 text-white p-4 flex items-center justify-center text-center">
+              <p class="text-lg">"If two witches would watch two watches, which witch would watch which watch?"</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
 
-    <script>
-        // Array to track used dice numbers (1-8)
-        let usedNumbers = [];
-        let availableNumbers = [1, 2, 3, 4, 5, 6, 7, 8];
+  <script>
+    // Array to track used dice numbers (1-8)
+    let usedNumbers = [];
+    let availableNumbers = [1, 2, 3, 4, 5, 6, 7, 8];
 
-        // Function to flip card on click
-        function flipCard(card) {
-            card.classList.toggle('flipped');
+    // Function to flip card on click
+    function flipCard(card) {
+      card.classList.toggle("flipped");
+    }
+
+    // Function to roll dice with enhanced animation
+    function rollDice() {
+      const diceBtn = document.getElementById("rollDiceBtn");
+      const diceContainer = document.getElementById("diceContainer");
+      const diceIcon = document.getElementById("diceIcon");
+      const diceNumber = document.getElementById("diceNumber");
+      const numberDisplay = document.getElementById("numberDisplay");
+
+      // Disable button during animation
+      diceBtn.disabled = true;
+
+      // Hide dice icon and show number container
+      diceIcon.style.opacity = "0";
+      diceNumber.style.opacity = "1";
+
+      // Reset available numbers if all are used
+      if (availableNumbers.length === 0) {
+        availableNumbers = [1, 2, 3, 4, 5, 6, 7, 8];
+        usedNumbers = [];
+      }
+
+      // Get random number from available numbers
+      const randomIndex = Math.floor(Math.random() * availableNumbers.length);
+      const selectedNumber = availableNumbers[randomIndex];
+
+      // Remove selected number from available and add to used
+      availableNumbers.splice(randomIndex, 1);
+      usedNumbers.push(selectedNumber);
+
+      // Show random numbers during animation
+      let animationCount = 0;
+      const animationInterval = setInterval(() => {
+        const randomNum = Math.floor(Math.random() * 8) + 1;
+        numberDisplay.textContent = randomNum;
+        animationCount++;
+
+        if (animationCount >= 8) {
+          clearInterval(animationInterval);
+          // Show final result
+          numberDisplay.textContent = selectedNumber;
+
+          // Rotate only the dice icon
+          diceIcon.classList.add("dice-roll");
+
+          // Update button text with the result
+          setTimeout(() => {
+            diceBtn.innerHTML = `<span class="truncate">Rolled: ${selectedNumber}</span>`;
+            diceIcon.classList.remove("dice-roll");
+            diceBtn.disabled = false;
+
+            // Reset after 3 seconds
+            setTimeout(() => {
+              diceBtn.innerHTML = `<span class="truncate">Roll Dice</span>`;
+              diceIcon.style.opacity = "1";
+              diceNumber.style.opacity = "0";
+            }, 3000);
+          }, 300);
         }
+      }, 150);
+    }
 
-        // Function to roll dice with enhanced animation
-        function rollDice() {
-            const diceBtn = document.getElementById('rollDiceBtn');
-            const diceContainer = document.getElementById('diceContainer');
-            const diceIcon = document.getElementById('diceIcon');
-            const diceNumber = document.getElementById('diceNumber');
-            const numberDisplay = document.getElementById('numberDisplay');
-
-            // Disable button during animation
-            diceBtn.disabled = true;
-            diceBtn.classList.add('dice-roll');
-
-            // Hide dice icon and show number container
-            diceIcon.style.opacity = '0';
-            diceNumber.style.opacity = '1';
-
-            // Reset available numbers if all are used
-            if (availableNumbers.length === 0) {
-                availableNumbers = [1, 2, 3, 4, 5, 6, 7, 8];
-                usedNumbers = [];
-            }
-
-            // Get random number from available numbers
-            const randomIndex = Math.floor(Math.random() * availableNumbers.length);
-            const selectedNumber = availableNumbers[randomIndex];
-
-            // Remove selected number from available and add to used
-            availableNumbers.splice(randomIndex, 1);
-            usedNumbers.push(selectedNumber);
-
-            // Show random numbers during animation
-            let animationCount = 0;
-            const animationInterval = setInterval(() => {
-                const randomNum = Math.floor(Math.random() * 8) + 1;
-                numberDisplay.textContent = randomNum;
-                animationCount++;
-
-                if (animationCount >= 8) {
-                    clearInterval(animationInterval);
-                    // Show final result
-                    numberDisplay.textContent = selectedNumber;
-                    diceContainer.classList.add('dice-bounce');
-
-                    // Update button text with the result
-                    setTimeout(() => {
-                        diceBtn.innerHTML = `<span class="truncate">Rolled: ${selectedNumber}</span>`;
-                        diceBtn.classList.remove('dice-roll');
-                        diceBtn.disabled = false;
-                        diceContainer.classList.remove('dice-bounce');
-
-                        // Reset after 3 seconds
-                        setTimeout(() => {
-                            diceBtn.innerHTML = `<span class="truncate">Roll Dice</span>`;
-                            diceIcon.style.opacity = '1';
-                            diceNumber.style.opacity = '0';
-                        }, 3000);
-                    }, 300);
-                }
-            }, 150);
-        }
-
-        // Add event listener to dice button
-        document.getElementById('rollDiceBtn').addEventListener('click', rollDice);
-    </script>
+    // Add event listener to dice button
+    document
+      .getElementById("rollDiceBtn")
+      .addEventListener("click", rollDice);
+  </script>
 </body>
 
 </html>
+apps-fileview.texmex_20250911.06_p0 code.html Displaying code.html.
